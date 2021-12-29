@@ -42,9 +42,12 @@ def perform_query():
     try:
         cmd1, value1, cmd2, value2 = res['cmd1'], res['value1'], res['cmd2'], res['value2']
     except KeyError:
-        return 'error: not enough parametrs', 400
+        return 'error: something wrong with parameters', 400
     data = file_reader(path)
-    data = FUNC_MAPPING[cmd1](data, value1)
-    data = FUNC_MAPPING[cmd2](data, value2)
+    try:
+        data = FUNC_MAPPING[cmd1](data, value1)
+        data = FUNC_MAPPING[cmd2](data, value2)
+    except KeyError:
+        return 'error: invalid parameters', 400
 
     return app.response_class(data, content_type="text/plain")
