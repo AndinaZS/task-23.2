@@ -1,5 +1,4 @@
 import os
-import json
 
 from flask import Flask, request
 
@@ -22,13 +21,16 @@ def map_func(data, param:str):
 def sorted_func(data, param:str):
     return sorted(data, reverse=True if param == 'desc' else False)
 
-def limit(data, param:int):
+def limit(data, param):
+    return [next(data) for _ in range(int(param))]
 
+def unique(data, param=''):
+    return set(data)
 
 FUNC_MAPPING={'filter': filter_func,
               'map': map_func,
               'sort': sorted_func,
-              'unic': 'unic',
+              'unique': unique,
               'limit': limit,}
 
 @app.route("/perform_query", methods=['POST'])
@@ -45,10 +47,4 @@ def perform_query():
     data = FUNC_MAPPING[cmd1](data, value1)
     data = FUNC_MAPPING[cmd2](data, value2)
 
-
-
-    # получить параметры query и file_name из request.args, при ошибке вернуть ошибку 400
-    # проверить, что файла file_name существует в папке DATA_DIR, при ошибке вернуть ошибку 400
-    # с помощью функционального программирования (функций filter, map), итераторов/генераторов сконструировать запрос
-    # вернуть пользователю сформированный результат
     return app.response_class(data, content_type="text/plain")
